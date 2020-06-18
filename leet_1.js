@@ -1,4 +1,5 @@
-
+// import {TreeNode, makeTree} from './basic';
+const Basic = require("./basic");
 /**
  * 542. 01 Matrix
  * @param {number[][]} matrix
@@ -246,3 +247,166 @@ var longestWord = function(words) {
 
 // console.log(longestWord(["w","wo","wor","worl", "world"]))
 // console.log(longestWord(["a", "banana", "app", "appl", "ap", "apply", "apple"]))
+
+/**
+ * @param {number[]} nums
+ * @return {boolean}
+ */
+var find132pattern = function(nums) {
+  if (nums.length < 3) {
+    return false;
+  }
+  let stack = [];
+  let cur = -Infinity;
+  for (let j = nums.length - 1; j >= 0; j--) {
+    if (nums[j] < cur) { 
+      return true;
+    }
+    while (stack.length > 0 && stack[stack.length - 1] < nums[j]) {
+      cur = stack.pop();
+    }
+    stack.push(nums[j]);
+  }
+  return false;
+};
+
+// console.log(find132pattern([3, 1, 6, 4]))
+// console.log(find132pattern([3,5,0,3,4]))
+
+/**
+ * @param {number[]} nums
+ * @return {boolean}
+ */
+var circularArrayLoop = function(nums) {
+  // let len = nums.length;
+  // if (len < 2) {
+  //   return false;
+  // }
+  // for (let i = 0; i < nums.length; i++) {
+  //   let directLeft = nums[i] < 0? true : false
+  //   let arr = {}
+  //   arr[i] = 1;
+  //   let next = (i + nums[i]) % len;
+  //   while (next != i && arr[next] != 1) {
+  //     if (directLeft && nums[next] > 0) {
+  //       break;
+  //     }
+  //     if (!directLeft && nums[next] < 0) {
+  //       break;
+  //     }
+  //     arr[next] = 1;
+  //     let nn = next + nums[next]; 
+  //     next = directLeft? nn + len : nn % len;
+  //   }
+  //   if (next == i && Object.keys(arr).length > 1) {
+  //     console.log(arr, nums)
+  //     return true
+  //   }
+  // }
+  // return false;
+};
+
+// console.log(circularArrayLoop([2,-1,1,2,2]))
+// console.log(circularArrayLoop([-1,2]))
+// console.log(circularArrayLoop([-2,1,-1,-2,-2]))
+// console.log(circularArrayLoop([2,2,2,2,2,4,7]))
+// console.log(circularArrayLoop([1,1,2]))
+
+// console.log(circularArrayLoop([2,-1,1,2,2]))
+// console.log(circularArrayLoop([-1,-1,-1]))
+
+/**
+ * @param {number} n
+ * @return {number}
+ */
+var minSteps = function(n) {
+  if (n == 1) {
+    return 0;
+  }
+  let start = 1;
+  let step = 1;
+  let pastBoard = 1;
+  while (start < n) {
+    start = pastBoard + start;
+    step++;
+    if (n % start == 0 && n != start) {
+      pastBoard = start;
+      step++;
+    }
+  }
+  console.log(step)
+};
+
+// minSteps(2);
+
+/**
+ * @param {TreeNode} root
+ * @return {TreeNode[]}
+ */
+var findDuplicateSubtrees = function(root) {
+  let stack = [];
+  let node = root;
+  let result = [];
+  while (true) {
+    while (node) {
+      stack.push(node);
+      node = node.left;
+    }
+    if (stack.length == 0) {
+      break;
+    }
+    node = stack.pop()
+    let same = findSameNode(node, stack)
+    if (same) {
+      let find = result.findIndex(function(v) {
+        return sameNode(v, node);
+      });
+      if (find == -1) {
+        result.push(node);
+      }
+    }
+    node = node.right;
+  }
+  return result;
+};
+/**
+ * @param {TreeNode} node
+ * @param {TreeNode[]} array
+ * @returns {TreeNode}
+ */
+var findSameNode = function(node, array) {
+  if (array.length == 0) {
+    return null;
+  }
+  let copy = Array.from(array);
+  let n = copy.pop();
+  n = n.right;
+  while (true) {
+    while (n) {
+      copy.push(n);
+      n = n.left;
+    }
+    if (copy.length == 0) {
+      return null;
+    }
+    n = copy.pop();
+    if (sameNode(node, n)) {
+      return n;
+    }
+    n = n.right;
+  }
+}
+
+var sameNode = function(ln, rn) {
+  if (!ln || !rn) {
+    return ln == rn;
+  }
+  if (ln.val != rn.val) {
+    return false;
+  }
+  return sameNode(ln.left, rn.left) && sameNode(ln.right, rn.right);
+}
+
+let root = Basic.makeTree([1,2,3,4,null,2,4,null,null, 4])
+
+findDuplicateSubtrees(root);
